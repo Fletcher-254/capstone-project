@@ -1,0 +1,12 @@
+{
+  "employees": [
+    {
+      "id": "19e1",
+      "name": "Joyce Gitari",
+      "idNumber": "32119714",
+      "phone": "0768819304",
+      "role": "casual",
+      "daysWorked": 12
+    }
+  ]
+}
