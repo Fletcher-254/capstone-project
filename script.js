@@ -34,7 +34,8 @@ function fetchEmployees() {
           Days Worked: ${emp.daysWorked}<br>
           <span class="salary">Total Pay: KES ${totalPay}</span>
           <div class="actions">
-            <button class="delete" onclick="deleteEmployee('${emp.id}')">Delete</button>
+            <button class="delete" onclick="deleteEmployee('${emp.id}')">Delete</button> // Deleting an employee
+          
 
           </div>
         `;
