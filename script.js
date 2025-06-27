@@ -1,91 +1,49 @@
-const roleRates = {
-  engineer: 5000,
-  supervisor: 3000,
-  siteagent: 2500,
-  driver: 1000,
-  casual: 900,
-};
+const apiBase = 'https://reqres.in/api/users';
+const employeeList = document.getElementById('employeeList');
+const totalCount = document.getElementById('totalCount');
 
-document.getElementById("employeeForm").addEventListener("submit", function (e) {
+document.getElementById('employeeForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  addEmployee();
+  const name = document.getElementById('nameInput').value.trim();
+  const role = document.getElementById('roleInput').value;
+  if (!name || !role) return;
+  
+  const response = await fetch(apiBase, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ name, job: role })
+  });
+  const resData = await response.json();
+  fetchEmployees();
 });
 
-function fetchEmployees() {
-  fetch("http://localhost:3000/employees")
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById("employeeList");
-      const totalPayDisplay = document.getElementById("totalPay");
-      list.innerHTML = "";
-      let totalPayroll = 0;
-
-      data.forEach(emp => {
-        const dailyRate = roleRates[emp.role.toLowerCase()] || 0;
-        const totalPay = emp.daysWorked * dailyRate;
-        totalPayroll += totalPay;
-
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <strong>${emp.name}</strong><br>
-          Role: ${emp.role}<br>
-          ID Number: ${emp.idNumber}<br>
-          Phone: ${emp.phone}<br>
-          Days Worked: ${emp.daysWorked}<br>
-          <span class="salary">Total Pay: KES ${totalPay}</span>
-          <div class="actions">
-            <button class="delete" onclick="deleteEmployee('${emp.id}')">Delete</button> // Deleting an employee
-          
-
-          </div>
-        `;
-        list.appendChild(li);
-      });
-
-      totalPayDisplay.textContent = `Total Payroll: KES ${totalPayroll}`;
-    });
-}
-
-function addEmployee() {
-  const name = document.getElementById("nameInput").value.trim();
-  const role = document.getElementById("roleInput").value;
-  const idNumber = document.getElementById("idNumberInput").value.trim();
-  const phone = document.getElementById("phoneInput").value.trim();
-  const daysWorked = parseInt(document.getElementById("daysInput").value);
-
-  const nameRegex = /^[A-Za-z\s]+$/;
-  if (!nameRegex.test(name)) {
-    alert("Name must only contain letters.");
-    return;
-  }
-
-  if (!name || !role || !idNumber || !phone || isNaN(daysWorked)) {
-    alert("Please fill in all fields correctly.");
-    return;
-  }
-
-  fetch("http://localhost:3000/employees", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name,
-      role,
-      idNumber,
-      phone,
-      daysWorked,
-    }),
-  }).then(() => {
-    document.getElementById("employeeForm").reset();
-    fetchEmployees();
+async function fetchEmployees() {
+  const res = await fetch(`${apiBase}?per_page=12`);
+  const data = await res.json();
+  const employees = data.data;
+  
+  employeeList.innerHTML = '';
+  employees.forEach(emp => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <img src="${emp.avatar}" alt="" />
+      <div class="employee-info">
+        <strong>${emp.first_name} ${emp.last_name}</strong><br>
+        Role: ${emp.job || '--'}
+      </div>
+      <div class="actions">
+        <button onclick="deleteEmployee(${emp.id})">Delete</button>
+      </div>
+    `;
+    employeeList.appendChild(li);
   });
+  
+  totalCount.textContent = `Total Employees: ${employees.length}`;
 }
 
-function deleteEmployee(id) {
-  fetch(`http://localhost:3000/employees/${id}`, {
-    method: "DELETE",
-  })
-    .then(() => fetchEmployees())
-    .catch(error => console.error("Delete failed:", error));
+async function deleteEmployee(id) {
+  await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
+  fetchEmployees();
 }
 
 window.onload = fetchEmployees;
