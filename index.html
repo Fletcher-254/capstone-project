@@ -3,31 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aquiltech Payroll Tracker</title>
+  <title>Employee Payroll Tracker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Payroll Tracker</h1>
-
+    <h1>Employee Payroll Tracker</h1>
     <form id="employeeForm">
-      <input type="text" id="nameInput" placeholder="Name" required />
-      <input type="text" id="idInput" placeholder="ID Number" required />
-      <input type="tel" id="phoneInput" placeholder="Phone Number" required />
+      <input type="text" id="nameInput" placeholder="Employee Name" required />
       <select id="roleInput" required>
         <option value="">Select Role</option>
         <option value="engineer">Engineer</option>
-        <option value="casual">Casual</option>
-        <option value="driver">Driver</option>
-        <option value="site agent">Site Agent</option>
         <option value="supervisor">Supervisor</option>
+        <option value="siteagent">Site Agent</option>
+        <option value="driver">Driver</option>
+        <option value="casual">Casual</option>
       </select>
-      <input type="number" id="daysInput" placeholder="Days Worked" required min="0" />
+      <input type="text" id="idNumberInput" placeholder="ID Number" required />
+      <input type="text" id="phoneInput" placeholder="Phone Number" required />
+      <input type="number" id="daysInput" placeholder="Days Worked" required />
       <button type="submit">Add Employee</button>
     </form>
 
-    <ul id="employeeList"></ul>
     <h3 id="totalPay">Total Payroll: KES 0</h3>
+    <ul id="employeeList"></ul>
   </div>
 
   <script src="script.js"></script>

@@ -1,9 +1,9 @@
 const roleRates = {
   engineer: 5000,
-  casual: 900,
+  supervisor: 3000,
+  siteagent: 2500,
   driver: 1000,
-  "site agent": 2500,
-  supervisor: 3000
+  casual: 900,
 };
 
 document.getElementById("employeeForm").addEventListener("submit", function (e) {
@@ -18,7 +18,6 @@ function fetchEmployees() {
       const list = document.getElementById("employeeList");
       const totalPayDisplay = document.getElementById("totalPay");
       list.innerHTML = "";
-
       let totalPayroll = 0;
 
       data.forEach(emp => {
@@ -28,12 +27,16 @@ function fetchEmployees() {
 
         const li = document.createElement("li");
         li.innerHTML = `
-          <strong>${emp.name}</strong> (${emp.role})<br>
-          ID: ${emp.idNumber}<br>
+          <strong>${emp.name}</strong><br>
+          Role: ${emp.role}<br>
+          ID Number: ${emp.idNumber}<br>
           Phone: ${emp.phone}<br>
           Days Worked: ${emp.daysWorked}<br>
-          <span class="salary">Total Pay: KES ${totalPay}</span><br>
-          <button class="delete" onclick="deleteEmployee(${emp.id})">Delete</button>
+          <span class="salary">Total Pay: KES ${totalPay}</span>
+          <div class="actions">
+            <button class="delete" onclick="deleteEmployee('${emp.id}')">Delete</button>
+
+          </div>
         `;
         list.appendChild(li);
       });
@@ -44,13 +47,19 @@ function fetchEmployees() {
 
 function addEmployee() {
   const name = document.getElementById("nameInput").value.trim();
-  const idNumber = document.getElementById("idInput").value.trim();
-  const phone = document.getElementById("phoneInput").value.trim();
   const role = document.getElementById("roleInput").value;
-  const days = parseInt(document.getElementById("daysInput").value);
+  const idNumber = document.getElementById("idNumberInput").value.trim();
+  const phone = document.getElementById("phoneInput").value.trim();
+  const daysWorked = parseInt(document.getElementById("daysInput").value);
 
-  if (!name || isNaN(days) || !role || !idNumber || !phone || /\d/.test(name)) {
-    alert("Please enter valid details. Name must contain only letters.");
+  const nameRegex = /^[A-Za-z\s]+$/;
+  if (!nameRegex.test(name)) {
+    alert("Name must only contain letters.");
+    return;
+  }
+
+  if (!name || !role || !idNumber || !phone || isNaN(daysWorked)) {
+    alert("Please fill in all fields correctly.");
     return;
   }
 
@@ -59,13 +68,12 @@ function addEmployee() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name,
+      role,
       idNumber,
       phone,
-      role,
-      daysWorked: days
-    })
-  })
-  .then(() => {
+      daysWorked,
+    }),
+  }).then(() => {
     document.getElementById("employeeForm").reset();
     fetchEmployees();
   });
@@ -75,7 +83,8 @@ function deleteEmployee(id) {
   fetch(`http://localhost:3000/employees/${id}`, {
     method: "DELETE",
   })
-  .then(() => fetchEmployees());
+    .then(() => fetchEmployees())
+    .catch(error => console.error("Delete failed:", error));
 }
 
 window.onload = fetchEmployees;
